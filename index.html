@@ -781,6 +781,10 @@ const RAL={};'1000 BEBD7F 1001 C2B078 1002 C6A664 1003 E5BE01 1004 CDA434 1005 A
 const ralCode=v=>{const d=String(v).replace(/\D/g,'');return d.length>=4?d.slice(0,4):''};
 const ralHex=v=>RAL[ralCode(v)]||null;
 let S=load();
+if(!S || !S.orders) S = {orders:[],requests:[],meta:{},stock:[],sklad:[],seq:0,oseq:0};
+S.orders = S.orders || [];
+S.requests = S.requests || [];
+S.sklad = S.sklad || [];
 /* компактное хранение: одинаковые фото/файлы сохраняются один раз */
 function serS(){const T={},idx=new Map;let n=0;const body=JSON.stringify(S,(k,v)=>{if(typeof v==='string'&&v.length>400&&v.startsWith('data:')){let i=idx.get(v);if(i===undefined){i=++n;idx.set(v,i);T[i]=v}return '@i:'+i}return v});return n?'{"im":'+JSON.stringify(T)+',"d":'+body+'}':body}
 function desS(txt){const v=JSON.parse(txt);if(v&&v.im&&v.d!==undefined){const T=v.im,f=o=>{if(Array.isArray(o)){for(let i=0;i<o.length;i++){const x=o[i];if(typeof x==='string'&&x.startsWith('@i:'))o[i]=T[x.slice(3)];else if(x&&typeof x==='object')f(x)}}else if(o&&typeof o==='object'){for(const k in o){const x=o[k];if(typeof x==='string'&&x.startsWith('@i:'))o[k]=T[x.slice(3)];else if(x&&typeof x==='object')f(x)}}};f(v.d);return v.d}return v}
@@ -1808,9 +1812,15 @@ async function loadFromIDB(){
 }
 const _origLoad=load;
 load=async function(){
-  const fromIdb=await loadFromIDB();
-  if(fromIdb) return fromIdb;
-  return _origLoad();
+  try{
+    const fromIdb=await loadFromIDB();
+    if(fromIdb && fromIdb.orders) return fromIdb;
+  }catch(e){}
+  const base = _origLoad() || {orders:[],requests:[],meta:{},stock:[],sklad:[],seq:0,oseq:0};
+  base.orders = base.orders || [];
+  base.requests = base.requests || [];
+  base.sklad = base.sklad || [];
+  return base;
 };
 const _origPersist=persist;
 persist=function(){
