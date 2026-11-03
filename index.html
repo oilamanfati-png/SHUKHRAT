@@ -848,8 +848,18 @@ function addRow(d){const tb=$('#tOrd tbody'),n=tb.rows.length+1,tr=tb.insertRow(
   $('input[type=file]',tr).onchange=async e=>{tr._f=[];for(const f of e.target.files){const o={name:f.name};if(isCad(f)){o.src=await cadPreview(f);toast('Файл «'+f.name+'» превращён в фото')}else if(f.type.startsWith('image/'))o.src=await shrink(f);tr._f.push(o)}$('.file span',tr).textContent=tr._f.map(x=>x.name).join(', ')};
   $('.x',tr).onclick=()=>{tr.remove();$$('#tOrd tbody td.rn').forEach((c,i)=>c.textContent=i+1);cnt()};if(d)fill(tr,d);else{const pr=tb.rows[tb.rows.length-2];if(pr){const a=$$('input:not([type=file])',pr),b=$$('input:not([type=file])',tr);[0,1,2].forEach(k=>b[k].value=a[k].value)}}cnt()}
 const cnt=()=>{$('#cnt').textContent='Позиций в заказе: '+$$('#tOrd tbody tr').length};
-function fill(tr,r){const i=$$('input:not([type=file])',tr),s=$$('select',tr);[r.acc,r.due,r.designer,r.item,r.th,r.h,r.l,r.w,r.qty,ralCode(r.ral)||r.ral].forEach((v,k)=>i[k].value=v??'');[r.metal,r.kind,r.dim,r.qu].forEach((v,k)=>{if(v)s[k].value=v});
- i[9].dispatchEvent(new Event('input'));const im=r.imgs||[];const files=r.files||[];tr._f=[...im,...files.filter(n=>!im.some(m=>m.name===n)).map(name=>({name}))];$('.file span',tr).textContent=files.join(', ')}
+function fill(tr,r){
+  if(!r) return;
+  const i=$$('input:not([type=file])',tr),s=$$('select',tr);
+  [r.acc,r.due,r.designer,r.item,r.th,r.h,r.l,r.w,r.qty,ralCode(r.ral)||r.ral||''].forEach((v,k)=>{if(i[k])i[k].value=v??''});
+  [r.metal,r.kind,r.dim,r.qu].forEach((v,k)=>{if(v&&s[k])s[k].value=v});
+  if(i[9])i[9].dispatchEvent(new Event('input'));
+  const im=Array.isArray(r.imgs)?r.imgs:[];
+  const files=Array.isArray(r.files)?r.files:[];
+  tr._f=[...im,...files.filter(n=>!im.some(m=>m&&m.name===n)).map(name=>({name}))];
+  const span=$('.file span',tr);
+  if(span)span.textContent=files.join(', ');
+}
 function loadOrder(o){editId=o.id;$('#cust').value=o.customer||'';$('#tOrd tbody').innerHTML='';$('#tCon tbody').innerHTML='';o.items.forEach(r=>addRow(r));o.cons.forEach(c=>addCon(c.name,c.qty,c.unit));if(!o.cons.length)addCon();
  $('#editBn').style.display='block';$('#editBn b').textContent='№'+o.id;$('#save').textContent='Сохранить изменения';go('order');$('#ttl').textContent='Редактирование заказа №'+o.id;checkAll()}
 function resetForm(){editId=null;$('#cust').value='';$('#tOrd tbody').innerHTML='';$('#tCon tbody').innerHTML='';addRow();addCon();$('#editBn').style.display='none';$('#save').textContent='Завершить и сохранить заказ';if($('#pg-order').classList.contains('on'))$('#ttl').textContent='Новый заказ'}
