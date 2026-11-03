@@ -849,7 +849,7 @@ function addRow(d){const tb=$('#tOrd tbody'),n=tb.rows.length+1,tr=tb.insertRow(
   $('.x',tr).onclick=()=>{tr.remove();$$('#tOrd tbody td.rn').forEach((c,i)=>c.textContent=i+1);cnt()};if(d)fill(tr,d);else{const pr=tb.rows[tb.rows.length-2];if(pr){const a=$$('input:not([type=file])',pr),b=$$('input:not([type=file])',tr);[0,1,2].forEach(k=>b[k].value=a[k].value)}}cnt()}
 const cnt=()=>{$('#cnt').textContent='Позиций в заказе: '+$$('#tOrd tbody tr').length};
 function fill(tr,r){const i=$$('input:not([type=file])',tr),s=$$('select',tr);[r.acc,r.due,r.designer,r.item,r.th,r.h,r.l,r.w,r.qty,ralCode(r.ral)||r.ral].forEach((v,k)=>i[k].value=v??'');[r.metal,r.kind,r.dim,r.qu].forEach((v,k)=>{if(v)s[k].value=v});
- i[9].dispatchEvent(new Event('input'));const im=r.imgs||[];tr._f=[...im,...r.files.filter(n=>!im.some(m=>m.name===n)).map(name=>({name}))];$('.file span',tr).textContent=r.files.join(', ')}
+ i[9].dispatchEvent(new Event('input'));const im=r.imgs||[];const files=r.files||[];tr._f=[...im,...files.filter(n=>!im.some(m=>m.name===n)).map(name=>({name}))];$('.file span',tr).textContent=files.join(', ')}
 function loadOrder(o){editId=o.id;$('#cust').value=o.customer||'';$('#tOrd tbody').innerHTML='';$('#tCon tbody').innerHTML='';o.items.forEach(r=>addRow(r));o.cons.forEach(c=>addCon(c.name,c.qty,c.unit));if(!o.cons.length)addCon();
  $('#editBn').style.display='block';$('#editBn b').textContent='№'+o.id;$('#save').textContent='Сохранить изменения';go('order');$('#ttl').textContent='Редактирование заказа №'+o.id;checkAll()}
 function resetForm(){editId=null;$('#cust').value='';$('#tOrd tbody').innerHTML='';$('#tCon tbody').innerHTML='';addRow();addCon();$('#editBn').style.display='none';$('#save').textContent='Завершить и сохранить заказ';if($('#pg-order').classList.contains('on'))$('#ttl').textContent='Новый заказ'}
@@ -1861,9 +1861,9 @@ document.getElementById('btnTest')?.addEventListener('click', ()=>{
   // Очистить и заполнить позиции
   $('#tOrd tbody').innerHTML = '';
   const testRows = [
-    {item:'Корпус шкафа', metal:'Сталь', kind:'Лист', th:2, h:800, l:1200, w:1.5, dim:'мм', qty:4, qu:'шт', ral:'7011', designer:'Иванов'},
-    {item:'Дверца', metal:'Нержавейка', kind:'Лист', th:1.5, h:700, l:500, w:1.2, dim:'мм', qty:2, qu:'шт', ral:'9005', designer:'Петров'},
-    {item:'Полка', metal:'Алюминий', kind:'Лист', th:3, h:600, l:400, w:2, dim:'мм', qty:6, qu:'шт', ral:'5010', designer:'Сидоров'}
+    {item:'Корпус шкафа', metal:'Сталь', kind:'Лист', th:2, h:800, l:1200, w:1.5, dim:'мм', qty:4, qu:'шт', ral:'7011', designer:'Иванов', files:[], imgs:[]},
+    {item:'Дверца', metal:'Нержавейка', kind:'Лист', th:1.5, h:700, l:500, w:1.2, dim:'мм', qty:2, qu:'шт', ral:'9005', designer:'Петров', files:[], imgs:[]},
+    {item:'Полка', metal:'Алюминий', kind:'Лист', th:3, h:600, l:400, w:2, dim:'мм', qty:6, qu:'шт', ral:'5010', designer:'Сидоров', files:[], imgs:[]}
   ];
   testRows.forEach(r=>addRow(r));
   // Расходные материалы
